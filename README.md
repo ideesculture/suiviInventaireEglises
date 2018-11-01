@@ -2,7 +2,7 @@
 
 ## Qu'est-ce que le CIPAR
 
-![CIPAR](https://www.cathobel.be/wp-content/uploads/2017/10/CIPAR-logoweb.jpg)
+![CIPAR](https://github.com/ideesculture/suiviInventaireEglises/raw/master/documentation/cipar.jpg)
 
 Le CIPAR est une ASBL fondée par les évêchés francophones de Belgique dans le but de coordonner leurs efforts en matière de protection, conservation et valorisation du patrimoine religieux.
 
