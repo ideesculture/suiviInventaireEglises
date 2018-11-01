@@ -70,6 +70,18 @@ Pour plus de facilité, cette requête est accessible depuis le menu Statistique
 **Suivi par type pour toutes les églises de la base par diocèse**
 
 ```
-select grandsparents.type_id, parents.parent_id, parents.type_id, objects.parent_id, objects.status, objects.object_id, count(*) from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 where objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null group by parents.parent_id, objects.status;
+select grandsparents.idno, CASE objects.status WHEN 0 THEN "en attente" WHEN 1 THEN "en cours" WHEN 2 THEN "à valider" WHEN 3 THEN "validé" ELSE "valeur incohérente" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 where objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null group by parents.parent_id, objects.status;
 
 ```
+
+Exemple de résultat (valeurs tests, non actualisées) :
+
+| idno | statut | nombre |
+|------|--------|--------|
+|tournai|en attente|461|
+|tournai|en cours|2|
+|liege|en attente|157|
+|namur|en attente|815|
+|namur|en cours|6|
+|brabant_wallon|en attente|24|
+|bruxelles|en attente|1|
