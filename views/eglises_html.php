@@ -4,6 +4,7 @@ define("__ASSET_IMAGE_DIR__", __DIR__."/images");
 define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglises/views/images");
 $vs_statistiques_globales = $this->getVar("statistiques_globales");
 $vs_diocese = $this->getVar("diocese");
+$va_eglises = $this->getVar("eglises");
 //var_dump($vs_statistiques_globales);die();
 ?>
 
@@ -32,6 +33,14 @@ $vs_diocese = $this->getVar("diocese");
             }
             print "</tr>";
             ?>
+            </table>
+            <table style="width:100%;">
+                <tr><th>ID</th><th>Identifiant</th><th>Statut</th></tr>
+                <?php
+                foreach($va_eglises as $eglise):
+                print "<tr><td>".$eglise["object_id"]."</td><td>".$eglise["idno"]."</td><td>".$eglise["status"]."</td></tr>";
+                endforeach;
+                ?>
             </table>
         </div>
     </div>
