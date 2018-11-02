@@ -10,8 +10,11 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
 
     <div class="row">
         <div class="col-md-12">
-            <div id="piechart" class="chart-container">
-                <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
+            <h2>CIPAR</h2>
+            <div class="chart-container">
+                <div id="piechart">
+                    <!--<img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>-->
+                </div>
             </div>
         </div>
     </div>
@@ -165,6 +168,6 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-        chart.draw(data, {width: 400, height: 240});
+        chart.draw(data, {width: "100%", height: 240});
     }
 </script>
