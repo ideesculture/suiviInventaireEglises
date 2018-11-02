@@ -12,7 +12,7 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
         <div class="col-md-12">
             <h2>CIPAR</h2>
             <div class="chart-container">
-                <div id="piechart">
+                <div id="cipar">
                     <!--<img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>-->
                 </div>
             </div>
@@ -24,12 +24,12 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
             <h2>Brabant-Wallon</h2>
             <div class="row">
                 <div class="col-md-6">
-                    <div id="piscine" class="chart-container">
+                    <div id="brabant_wallon" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png" />
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div id="top_x_div2" class="chart-container">
+                    <div id="brabant_wallon_bars" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
                     </div>
                 </div>
@@ -40,12 +40,12 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
             <h2>Bruxelles</h2>
             <div class="row">
                 <div class="col-md-6">
-                    <div id="bouboule" class="chart-container">
+                    <div id="bruxelles" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div id="top_x_div2" class="chart-container">
+                    <div id="bruxelles_bars" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
                     </div>
                 </div>
@@ -58,12 +58,12 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
             <h2>Liège</h2>
             <div class="row">
                 <div class="col-md-6">
-                    <div id="piscine" class="chart-container">
+                    <div id="liege" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div id="top_x_div2" class="chart-container">
+                    <div id="liege_bars" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
                     </div>
                 </div>
@@ -74,12 +74,12 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
             <h2>Namur</h2>
             <div class="row">
                 <div class="col-md-6">
-                    <div id="bouboule" class="chart-container">
+                    <div id="namur" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div id="top_x_div2" class="chart-container">
+                    <div id="namur_bars" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
                     </div>
                 </div>
@@ -92,12 +92,12 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
             <h2>Tournai</h2>
             <div class="row">
                 <div class="col-md-6">
-                    <div id="piscine" class="chart-container">
+                    <div id="tournai" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div id="top_x_div2" class="chart-container">
+                    <div id="tournai_bars" class="chart-container">
                         <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
                     </div>
                 </div>
@@ -154,20 +154,91 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
     google.charts.load('current', {'packages':['corechart']});
 
     // Set a callback to run when the Google Visualization API is loaded.
-    google.charts.setOnLoadCallback(drawChart);
+    google.charts.setOnLoadCallback(drawCharts);
 
-    function drawChart() {
-        var jsonData = $.ajax({
+    function drawCharts() {
+        var jsonData1 = $.ajax({
             url: "<?php print __CA_URL_ROOT__; ?>/index.php/suiviInventaireEglises/Statistics/Json",
             dataType: "json",
             async: false
         }).responseText;
+        var jsonData2 = $.ajax({
+            url: "<?php print __CA_URL_ROOT__; ?>/index.php/suiviInventaireEglises/Statistics/Json/diocese/brabant_wallon",
+            dataType: "json",
+            async: false
+        }).responseText;
+        var jsonData3 = $.ajax({
+            url: "<?php print __CA_URL_ROOT__; ?>/index.php/suiviInventaireEglises/Statistics/Json/diocese/bruxelles",
+            dataType: "json",
+            async: false
+        }).responseText;
+        var jsonData4 = $.ajax({
+            url: "<?php print __CA_URL_ROOT__; ?>/index.php/suiviInventaireEglises/Statistics/Json/diocese/liege",
+            dataType: "json",
+            async: false
+        }).responseText;
+        var jsonData5 = $.ajax({
+            url: "<?php print __CA_URL_ROOT__; ?>/index.php/suiviInventaireEglises/Statistics/Json/diocese/namur",
+            dataType: "json",
+            async: false
+        }).responseText;
+        var jsonData6 = $.ajax({
+            url: "<?php print __CA_URL_ROOT__; ?>/index.php/suiviInventaireEglises/Statistics/Json/diocese/tournai",
+            dataType: "json",
+            async: false
+        }).responseText;
+
+
+        var pie_options_large = {
+            legend: 'none',
+            pieSliceText: 'label',
+            width: "100%", height: 240
+        };
+        var pie_options = {
+            legend: 'none',
+            pieSliceText: 'label',
+            width: "100%", height: 120
+        };
+        var histogram_options = {
+            legend: { position: 'none' }
+        };
 
         // Create our data table out of JSON data loaded from server.
-        var data = new google.visualization.DataTable(jsonData);
+        var data1 = new google.visualization.DataTable(jsonData1);
+        var data2 = new google.visualization.DataTable(jsonData2);
+        var data3 = new google.visualization.DataTable(jsonData3);
+        var data4 = new google.visualization.DataTable(jsonData4);
+        var data5 = new google.visualization.DataTable(jsonData5);
+        var data6 = new google.visualization.DataTable(jsonData6);
 
         // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-        chart.draw(data, {width: "100%", height: 240});
+        var chart1 = new google.visualization.PieChart(document.getElementById('cipar'));
+        chart1.draw(data1, pie_options_large);
+
+        var chart2 = new google.visualization.PieChart(document.getElementById('brabant_wallon'));
+        chart2.draw(data2, pie_options);
+        var histogram1 = new google.visualization.ColumnChart(document.getElementById('brabant_wallon_bars'));
+        histogram1.draw(data2, histogram_options);
+
+        var chart3 = new google.visualization.PieChart(document.getElementById('bruxelles'));
+        chart3.draw(data3, pie_options);
+        var histogram2 = new google.visualization.ColumnChart(document.getElementById('bruxelles_bars'));
+        histogram2.draw(data3, histogram_options);
+
+        var chart4 = new google.visualization.PieChart(document.getElementById('liege'));
+        chart4.draw(data4, pie_options);
+        var histogram3 = new google.visualization.ColumnChart(document.getElementById('liege_bars'));
+        histogram3.draw(data4, histogram_options);
+
+        var chart5 = new google.visualization.PieChart(document.getElementById('namur'));
+        chart5.draw(data5, pie_options);
+        var histogram4 = new google.visualization.ColumnChart(document.getElementById('namur_bars'));
+        histogram4.draw(data5, histogram_options);
+
+        var chart6 = new google.visualization.PieChart(document.getElementById('tournai'));
+        chart6.draw(data6, pie_options);
+        var histogram5 = new google.visualization.ColumnChart(document.getElementById('tournai_bars'));
+        histogram5.draw(data6, histogram_options);
+
     }
 </script>
