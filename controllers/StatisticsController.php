@@ -97,7 +97,6 @@
 
             $o_data = new Db();
             $vs_query = "select CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 WHERE objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null $ps_where GROUP BY objects.status;";
-            print($vs_query);die();
             $qr_result = $o_data->query($vs_query);
             $va_result = [];
             while($qr_result->nextRow()) {
