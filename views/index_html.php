@@ -2,6 +2,8 @@
 //$va_statistics 	= $this->getVar('statistics_listing');
 define("__ASSET_IMAGE_DIR__", __DIR__."/images");
 define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglises/views/images");
+$vs_statistiques_globales = $this->getVar("statistiques_globales");
+//var_dump($vs_statistiques_globales);die();
 ?>
 
 <h1>Suivi de l'inventaire des églises</h1>
@@ -16,6 +18,17 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
                     <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
                 </div>
             </div>
+            <table class="cipar_table">
+            <?php
+            foreach($vs_statistiques_globales as $row):
+                print "<tr>";
+                foreach($row as $col):
+                    print "<td>$col</td>\n";
+                endforeach;
+                print "</tr>";
+            endforeach;
+            ?>
+            </table>
         </div>
     </div>
 
@@ -144,6 +157,17 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
     #cipar img {
         width: auto;
         max-height: 240px;
+    }
+    table.cipar_table {
+        margin:auto;
+        margin-bottom:40px;
+
+    }
+    table tr:nth-child(2n+1) {
+        background-color:lightgrey;
+    }
+    table td {
+        padding:10px 20px;
     }
 </style>
 
