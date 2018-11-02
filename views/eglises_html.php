@@ -3,118 +3,35 @@
 define("__ASSET_IMAGE_DIR__", __DIR__."/images");
 define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglises/views/images");
 $vs_statistiques_globales = $this->getVar("statistiques_globales");
+$vs_diocese = $this->getVar("diocese");
 //var_dump($vs_statistiques_globales);die();
 ?>
 
-<h1>Suivi de l'inventaire des églises</h1>
+<h1><?php print $vs_diocese; ?></h1>
+<h2>Suivi de l'inventaire des églises</h2>
 
 <div class="suiviInventaire container">
 
     <div class="row">
         <div class="col-md-12">
-            <h2>CIPAR</h2>
-            <div class="chart-container">
-                <div id="cipar">
-                    <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
-                </div>
-            </div>
             <table class="cipar_table">
             <?php
+            $total = [];
             foreach($vs_statistiques_globales as $row):
                 print "<tr>";
-                foreach($row as $col):
+                foreach($row as $key=>$col):
                     print "<td>$col</td>\n";
+                    $total[$key] += $col;
                 endforeach;
                 print "</tr>";
             endforeach;
+            print "<tr>";
+            foreach($total as $key=>$val) {
+                print "<th>".($val >0 ? $val : "")."</th>\n";
+            }
+            print "</tr>";
             ?>
             </table>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <h2><a href="/gestion/index.php/suiviInventaireEglises/Statistics/Eglises/diocese/brabant_wallont">Brabant-Wallon</a></h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div id="brabant_wallon" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png" />
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div id="brabant_wallon_bars" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <h2><a href="/gestion/index.php/suiviInventaireEglises/Statistics/Eglises/diocese/bruxelles">Bruxelles</a></h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div id="bruxelles" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div id="bruxelles_bars" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <h2><a href="/gestion/index.php/suiviInventaireEglises/Statistics/Eglises/diocese/liege">Liège</a></h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div id="liege" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div id="liege_bars" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <h2><a href="/gestion/index.php/suiviInventaireEglises/Statistics/Eglises/diocese/namur">Namur</a></h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div id="namur" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div id="namur_bars" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <h2><a href="/gestion/index.php/suiviInventaireEglises/Statistics/Eglises/diocese/tournai">Tournai</a></h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div id="tournai" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div id="tournai_bars" class="chart-container">
-                        <img src="<?php print __ASSET_IMAGE_URL__; ?>/bars.png" />
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -122,43 +39,11 @@ $vs_statistiques_globales = $this->getVar("statistiques_globales");
 <div style="margin-bottom:100px;clear:both;"></div>
 
 <style>
-    .suiviInventaire > div,
-    .suiviInventaire > div > div {
-        /*border:1px solid red;*/
-    }
-    .suiviInventaire h2 {
-        font-size:18px;
-    }
-    .suiviInventaire .row {
-        width:100%;
-        clear:both;
-    }
-    .col-md-6 {
-        width:46%;
-        margin-right:3%;
-        margin-left:0;
-        float:left;
-        /*border:1px solid blue;*/
-        min-height: 40px;
-    }
-    .col-md-6:last-child {
-        margin-right:0;
-    }
-    .col-md-6:first-child {
-        margin-left:1.5%;
-    }
-    .chart-container {
-        text-align: center;
-    }
-    .suiviInventaire img {
-        max-width: 80%;
-        height: auto;
-    }
-    #cipar img {
-        width: auto;
-        max-height: 240px;
+    h1 {
+        text-transform: capitalize;
     }
     table.cipar_table {
+        width:100%;
         margin:auto;
         margin-bottom:40px;
 
@@ -166,7 +51,7 @@ $vs_statistiques_globales = $this->getVar("statistiques_globales");
     table tr:nth-child(2n+1) {
         background-color:lightgrey;
     }
-    table td {
+    table td, table th {
         padding:10px 20px;
     }
 </style>

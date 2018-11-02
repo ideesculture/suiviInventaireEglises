@@ -69,9 +69,6 @@
  		# Functions to render views
  		# -------------------------------------------------------
  		public function Index($type="") {
- 			//$universe=$this->request->getParameter('universe', pString);
-            //$this->view->setVar('statistics_listing', $this->opa_statistics[$universe]);
-            $diocese=$this->request->getParameter('diocese', pString);
             $o_data = new Db();
             $vs_query = "select CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 WHERE objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null GROUP BY objects.status;";
             $qr_result = $o_data->query($vs_query);
@@ -82,6 +79,31 @@
             $this->view->setVar('statistiques_globales', $va_result);
             $this->render('index_html.php');
  		}
+
+        public function Eglises($type="") {
+            //$universe=$this->request->getParameter('universe', pString);
+            //$this->view->setVar('statistics_listing', $this->opa_statistics[$universe]);
+            $diocese=$this->request->getParameter('diocese', pString);
+            $ps_where = "";
+            if($diocese != "") {
+                $this->view->setVar('diocese', $diocese);
+                $ps_where = " AND grandsparents.idno = \"".$diocese."\" ";
+            }
+
+            $o_data = new Db();
+            $vs_query = "select CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 WHERE objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null $ps_where GROUP BY objects.status;";
+            $qr_result = $o_data->query($vs_query);
+            $va_result = [];
+            while($qr_result->nextRow()) {
+                array_push($va_result, ["statut"=>$qr_result->get('statut'), "nombre"=>$qr_result->get('nombre')]);
+            }
+            $this->view->setVar('statistiques_globales', $va_result);
+            $this->render('eglises_html.php');
+        }
+
+        /*
+         * Json based views
+         */
 
  		public function JsonDioceses() {
             $o_data = new Db();
