@@ -265,6 +265,5 @@ $vs_statistiques_globales = $this->getVar("statistiques_globales");
         chart6.draw(data6, pie_options);
         var histogram5 = new google.visualization.ColumnChart(document.getElementById('tournai_bars'));
         histogram5.draw(data6, histogram_options);
-
     }
 </script>
