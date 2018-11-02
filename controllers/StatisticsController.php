@@ -74,7 +74,7 @@
             $this->render('index_html.php');
  		}
 
- 		public function Json() {
+ 		public function JsonDioceses() {
             $o_data = new Db();
             $qr_result = $o_data->query("select grandsparents.idno, CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 where objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null group by parents.parent_id, objects.status;");
             $first=1;
@@ -88,6 +88,48 @@
             }
             print "]\n";
             exit;
+        }
+
+        public function Json() {
+            $o_data = new Db();
+            $qr_result = $o_data->query("select CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 where objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null group by objects.status;");
+            $va_result = [];
+            while($qr_result->nextRow()) {
+                array_push($va_result, ["statut"=>$qr_result->get('statut'), "nombre"=>$qr_result->get('nombre')]);
+            }
+            print $this->arrayToGoogleDataTable($va_result);
+            exit;
+        }
+
+        // Private functions
+        // Google for dataviz requires this particular form of JSON : https://developers.google.com/chart/interactive/docs/php_example
+        private function arrayToGoogleDataTable($array) {
+ 		    $first_row = current($array);
+ 		    $keys = array_keys($first_row);
+ 		    $result="";
+            $result .= "{\"cols\": [\n";
+ 		    foreach($keys as $num=>$key) {
+ 		        if($num != 0) $result.=",\n";
+                $result .=  "\t{\"id\":\"\",\"label\":\"".$key."\",\"pattern\":\"\",\"type\":\"".($num == 0 ? "string" : "number")."\"}";
+            }
+            $result .=  "\n],\n\"rows\": [\n";
+
+ 		    foreach($array as $num=>$row) {
+                if($num != 0) $result.=",\n";
+                $num2 = 0;
+                $result .=  "\t{\"c\":[";
+ 		        foreach($row as $key=>$value) {
+                    if($num2 != 0) $result.=",";
+                    if(is_string($value)) {
+                        $value = "\"".$value."\"";
+                    }
+                    $result .= "{\"v\":".$value.",\"f\":null}";
+                    $num2++;
+                }
+                $result .= "]}";
+            }
+            $result .=  "\n]}";
+ 		    return $result;
         }
 
  	}
