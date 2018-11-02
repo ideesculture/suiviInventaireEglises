@@ -13,7 +13,7 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
             <h2>CIPAR</h2>
             <div class="chart-container">
                 <div id="cipar">
-                    <!--<img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>-->
+                    <img src="<?php print __ASSET_IMAGE_URL__; ?>/pie.png"/>
                 </div>
             </div>
         </div>
@@ -137,12 +137,13 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
     .chart-container {
         text-align: center;
     }
-    #piechart img {
-        max-width: 40%;
-    }
-    .chart-container img {
-        max-width: 100%;
+    .suiviInventaire img {
+        max-width: 80%;
         height: auto;
+    }
+    #cipar img {
+        width: auto;
+        max-height: 240px;
     }
 </style>
 
@@ -200,7 +201,8 @@ define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglis
             width: "100%", height: 120
         };
         var histogram_options = {
-            legend: { position: 'none' }
+            legend: { position: 'none' },
+            height: 120
         };
 
         // Create our data table out of JSON data loaded from server.
