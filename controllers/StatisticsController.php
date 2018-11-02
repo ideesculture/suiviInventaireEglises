@@ -91,8 +91,14 @@
         }
 
         public function Json() {
+            $diocese=$this->request->getParameter('diocese', pString);
+            $ps_where = "";
+            if($diocese != "") $ps_where = " AND grandsparents.idno = \"".$diocese."\" ";
+
             $o_data = new Db();
-            $qr_result = $o_data->query("select CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 where objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null group by objects.status;");
+            $vs_query = "select CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut, count(*) as nombre from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 WHERE objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null $ps_where GROUP BY objects.status;";
+            print($vs_query);die();
+            $qr_result = $o_data->query($vs_query);
             $va_result = [];
             while($qr_result->nextRow()) {
                 array_push($va_result, ["statut"=>$qr_result->get('statut'), "nombre"=>$qr_result->get('nombre')]);
@@ -101,8 +107,29 @@
             exit;
         }
 
-        // Private functions
-        // Google for dataviz requires this particular form of JSON : https://developers.google.com/chart/interactive/docs/php_example
+        /*
+         *   Private functions
+         */
+
+
+        /*  Google for dataviz requires this particular form of JSON
+            https://developers.google.com/chart/interactive/docs/php_example
+            The goal is to obtain this :
+            {
+              "cols": [
+                    {"id":"","label":"Topping","pattern":"","type":"string"},
+                    {"id":"","label":"Slices","pattern":"","type":"number"}
+                  ],
+              "rows": [
+                    {"c":[{"v":"Mushrooms","f":null},{"v":3,"f":null}]},
+                    {"c":[{"v":"Onions","f":null},{"v":1,"f":null}]},
+                    {"c":[{"v":"Olives","f":null},{"v":1,"f":null}]},
+                    {"c":[{"v":"Zucchini","f":null},{"v":1,"f":null}]},
+                    {"c":[{"v":"Pepperoni","f":null},{"v":2,"f":null}]}
+                  ]
+            }
+         */
+
         private function arrayToGoogleDataTable($array) {
  		    $first_row = current($array);
  		    $keys = array_keys($first_row);
@@ -120,9 +147,13 @@
                 $result .=  "\t{\"c\":[";
  		        foreach($row as $key=>$value) {
                     if($num2 != 0) $result.=",";
-                    if(is_string($value)) {
+                    if($this->is_digit($value)) {
+                        $value = $value*1;
+                    }
+                        else {
                         $value = "\"".$value."\"";
                     }
+
                     $result .= "{\"v\":".$value.",\"f\":null}";
                     $num2++;
                 }
@@ -130,6 +161,18 @@
             }
             $result .=  "\n]}";
  		    return $result;
+        }
+
+        // Simple is_digit function
+        private function is_digit($digit) {
+            if(is_int($digit)) {
+                return true;
+            } elseif(is_string($digit)) {
+                return ctype_digit($digit);
+            } else {
+                // booleans, floats and others
+                return false;
+            }
         }
 
  	}
