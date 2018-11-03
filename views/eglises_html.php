@@ -15,6 +15,10 @@ $vs_diocese = $this->getVar("diocese");
 ?>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css"/>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.2/js/buttons.print.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
 <h1><?php print $vs_diocese; ?></h1>
 <h2>Suivi de l'inventaire des églises</h2>
@@ -72,9 +76,14 @@ $vs_diocese = $this->getVar("diocese");
     .en.cours {
         background-color: #00b3ee;
     }
-    #eglises_table,
+    #eglises_table {
+        margin-top:10px;
+    }
     #eglises_table_wrapper {
         margin-top:40px;
+    }
+    .dt-buttons {
+        display: inline-block;
     }
 </style>
 
@@ -82,6 +91,10 @@ $vs_diocese = $this->getVar("diocese");
     $(document).ready(function() {
         $('#eglises_table').DataTable({
             "pageLength": 25,
+            "dom": 'Bfrtip',
+            "buttons": [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
             "language":{
                 "sProcessing":     "Traitement en cours...",
                 "sSearch":         "Rechercher&nbsp;:",
