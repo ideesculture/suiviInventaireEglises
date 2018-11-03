@@ -95,15 +95,26 @@
             $qr_result = $o_data->query($vs_query);
             $va_result = [];
             while($qr_result->nextRow()) {
-                array_push($va_result, ["statut"=>$qr_result->get('statut'), "nombre"=>$qr_result->get('nombre')]);
+                $va_result[$qr_result->get('statut')] += $qr_result->get('nombre');
             }
-            $this->view->setVar('statistiques_globales', $va_result);
+            $this->view->setVar('totaux', $va_result);
 
-            $vs_query = "select objects.object_id, objects.idno, objects.status from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 WHERE objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null order by 2;";
+            //$vs_query = "select objects.object_id, objects.idno, objects.status from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 WHERE objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null $ps_where order by 2;";
+            $vs_query = "select grandsparents.idno as diocese, concat(\"<a href=/gestion/index.php/editor/objects/ObjectEditor/Summary/object_id/\",parents.object_id,\">\", parents.idno, \"</a> \",parentslabels.name) as fabrique, objects.object_id, concat(\"<a href=/gestion/index.php/editor/objects/ObjectEditor/Summary/object_id/\",objects.object_id,\">\", objects.idno, \"</a> \",labels.name) as idno, CASE objects.status WHEN 0 THEN \"en attente\" WHEN 1 THEN \"en cours\" WHEN 2 THEN \"à valider\" WHEN 3 THEN \"validé\" ELSE \"valeur incohérente\" END as statut from ca_objects as objects left join ca_objects as parents on parents.object_id=objects.parent_id left join ca_objects as grandsparents on parents.parent_id=grandsparents.object_id and grandsparents.type_id=261 left join ca_object_labels as parentslabels on parentslabels.object_id=parents.object_id and parentslabels.is_preferred=1 left join ca_object_labels as labels on labels.object_id=objects.object_id and labels.is_preferred=1 WHERE objects.type_id = 262 and objects.deleted=0 and parents.type_id=23 and parents.parent_id is not null and grandsparents.object_id is not null $ps_where order by 1,2,3,4;";
+            //var_dump($vs_query);die();
+
             $qr_result = $o_data->query($vs_query);
             $va_result = [];
             while($qr_result->nextRow()) {
-                array_push($va_result, ["object_id"=>$qr_result->get('object_id'), "idno"=>$qr_result->get('idno'), "status"=>$qr_result->get('status')]);
+                array_push($va_result,
+                    [
+                        "diocese"=>$qr_result->get('diocese'),
+                        "fabrique"=>$qr_result->get('fabrique'),
+                        "object_id"=>$qr_result->get('object_id'),
+                        "idno"=>$qr_result->get('idno'),
+                        "status"=>$qr_result->get('statut')
+                    ]
+                );
             }
             $this->view->setVar('eglises', $va_result);
             $this->render('eglises_html.php');

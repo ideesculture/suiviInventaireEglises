@@ -3,10 +3,18 @@
 define("__ASSET_IMAGE_DIR__", __DIR__."/images");
 define("__ASSET_IMAGE_URL__", __CA_URL_ROOT__."/app/plugins/suiviInventaireEglises/views/images");
 $vs_statistiques_globales = $this->getVar("statistiques_globales");
-$vs_diocese = $this->getVar("diocese");
+$va_totaux = $this->getVar("totaux");
+$vn_totaux = array_sum($va_totaux);
 $va_eglises = $this->getVar("eglises");
+$vs_diocese = $this->getVar("diocese");
 //var_dump($vs_statistiques_globales);die();
 ?>
+
+<?php
+    // https://datatables.net
+?>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css"/>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
 
 <h1><?php print $vs_diocese; ?></h1>
 <h2>Suivi de l'inventaire des églises</h2>
@@ -14,35 +22,27 @@ $va_eglises = $this->getVar("eglises");
 <div class="suiviInventaire container">
 
     <div class="row">
-        <div class="col-md-12">
-            <div id="cipar"></div>
-            <table class="cipar_table">
+        <span class="col-md-12">
+            <div id="global_profession">
             <?php
-            $total = [];
-            foreach($vs_statistiques_globales as $row):
-                print "<tr>";
-                foreach($row as $key=>$col):
-                    print "<td>$col</td>\n";
-                    $total[$key] += $col;
-                endforeach;
-                print "</tr>";
+            foreach($va_totaux as $statut=>$value):
+                print "<div class='".$statut." progression' style='width:".round($value*100/$vn_totaux)."%;'></div>";
             endforeach;
-            print "<tr>";
-            foreach($total as $key=>$val) {
-                print "<th>".($val >0 ? $val : "")."</th>\n";
-            }
-            print "</tr>";
             ?>
-            </table>
-            <table style="width:100%;">
-                <tr><th>ID</th><th>Identifiant</th><th>Statut</th></tr>
+            </div>
+            <?php foreach($va_totaux as $statut=>$value): ?>
+                <span class="<?php print $statut; ?> legende"></span> <?php print $statut; ?>
+            <?php endforeach; ?>
+            <table id="eglises_table" style="width:100%;">
+                <thead><tr><th>Diocèse</th><th>Fabrique</th><th>Identifiant</th><th>Statut</th></tr></thead>
+                <tbody>
                 <?php
                 foreach($va_eglises as $eglise):
-                print "<tr><td>".$eglise["object_id"]."</td><td>".$eglise["idno"]."</td><td>".$eglise["status"]."</td></tr>";
+                print "<tr><td>".strtoupper($eglise["diocese"])."</td><td>".$eglise["fabrique"]."</td><td>".$eglise["idno"]."</td><td>".$eglise["status"]."</td></tr>";
                 endforeach;
                 ?>
+                </tbody>
             </table>
-        </div>
     </div>
 
 </div>
@@ -52,50 +52,65 @@ $va_eglises = $this->getVar("eglises");
     h1 {
         text-transform: capitalize;
     }
-    table.cipar_table {
-        width:100%;
-        margin:auto;
-        margin-bottom:40px;
-
+    #global_profession {
+        background-color:darkgrey;
     }
-    table tr:nth-child(2n+1) {
-        background-color:lightgrey;
+    .progression {
+        height:6px;
+        background-color: red;
+        margin-bottom: 10px;
+        float:left;
     }
-    table td, table th {
-        padding:10px 20px;
+    .legende {
+        height:10px;
+        width:10px;
+        display:inline-block;
+    }
+    .en.attente {
+        background-color: #3D3D3D;
+    }
+    .en.cours {
+        background-color: #00b3ee;
+    }
+    #eglises_table,
+    #eglises_table_wrapper {
+        margin-top:40px;
     }
 </style>
 
-<!--Load the AJAX API-->
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
 <script>
-    // Load the Visualization API and the piechart package.
-    google.charts.load('current', {'packages':['corechart']});
-
-    // Set a callback to run when the Google Visualization API is loaded.
-    google.charts.setOnLoadCallback(drawCharts);
-
-    function drawCharts() {
-        var jsonData1 = $.ajax({
-            url: "<?php print __CA_URL_ROOT__; ?>/index.php/suiviInventaireEglises/Statistics/Json/diocese/<?php print $vs_diocese; ?>",
-            dataType: "json",
-            async: false
-        }).responseText;
-
-        var pie_options_large = {
-            legend: 'none',
-            pieSliceText: 'label',
-            width: "100%", height: 240,
-            isStacked: true
-        };
-
-        // Create our data table out of JSON data loaded from server.
-        var data1 = new google.visualization.DataTable(jsonData1);
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart1 = new google.visualization.BarChart(document.getElementById('cipar'));
-        chart1.draw(data1, pie_options_large);
-
-    }
+    $(document).ready(function() {
+        $('#eglises_table').DataTable({
+            "pageLength": 25,
+            "language":{
+                "sProcessing":     "Traitement en cours...",
+                "sSearch":         "Rechercher&nbsp;:",
+                "sLengthMenu":     "Afficher _MENU_ &eacute;l&eacute;ments",
+                "sInfo":           "Affichage de l'&eacute;l&eacute;ment _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
+                "sInfoEmpty":      "Affichage de l'&eacute;l&eacute;ment 0 &agrave; 0 sur 0 &eacute;l&eacute;ment",
+                "sInfoFiltered":   "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
+                "sInfoPostFix":    "",
+                "sLoadingRecords": "Chargement en cours...",
+                "sZeroRecords":    "Aucun &eacute;l&eacute;ment &agrave; afficher",
+                "sEmptyTable":     "Aucune donn&eacute;e disponible dans le tableau",
+                "oPaginate": {
+                    "sFirst":      "Premier",
+                        "sPrevious":   "Pr&eacute;c&eacute;dent",
+                        "sNext":       "Suivant",
+                        "sLast":       "Dernier"
+                },
+                "oAria": {
+                    "sSortAscending":  ": activer pour trier la colonne par ordre croissant",
+                    "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant"
+                },
+                "select": {
+                    "rows": {
+                        _: "%d lignes séléctionnées",
+                            0: "Aucune ligne séléctionnée",
+                            1: "1 ligne séléctionnée"
+                    }
+                }
+            }
+        });
+    });
 </script>
