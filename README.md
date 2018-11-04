@@ -85,3 +85,4 @@ Exemple de résultat (valeurs tests, non actualisées) :
 |namur|en cours|6|
 |brabant_wallon|en attente|24|
 |bruxelles|en attente|1|
+
