@@ -38,11 +38,24 @@ $vs_diocese = $this->getVar("diocese");
                 <span class="<?php print $statut; ?> legende"></span> <?php print $statut; ?>
             <?php endforeach; ?>
             <table id="eglises_table" style="width:100%;">
-                <thead><tr><th>Diocèse</th><th>Fabrique</th><th>Identifiant</th><th>Statut</th></tr></thead>
+                <thead><tr><th>Diocèse</th><th>Fabrique</th><th>Église</th><th>Statut</th><th>Avancement</th></tr></thead>
                 <tbody>
                 <?php
                 foreach($va_eglises as $eglise):
-                print "<tr><td>".strtoupper($eglise["diocese"])."</td><td>".$eglise["fabrique"]."</td><td>".$eglise["idno"]."</td><td>".$eglise["status"]."</td></tr>";
+                print "<tr><td>"
+                    .strtoupper($eglise["diocese"])
+                    ."</td><td>"
+                    .$eglise["fabrique"]
+                    ."</td><td>"
+                    .$eglise["idno"]
+                    ."</td><td>"
+                    .$eglise["status"]
+                    ."</td><td>"
+                    ."<a href="
+                    .__CA_URL_ROOT__
+                    ."/index.php/suiviInventaireEglises/Statistics/Eglise/ID/"
+                    .$eglise["object_id"]
+                    .">Voir</a></td></tr>";
                 endforeach;
                 ?>
                 </tbody>
