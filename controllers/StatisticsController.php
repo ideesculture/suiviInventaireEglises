@@ -33,9 +33,10 @@
  	require_once(__CA_MODELS_DIR__.'/ca_object_representations.php');
  	require_once(__CA_MODELS_DIR__.'/ca_locales.php');
  	require_once(__CA_APP_DIR__.'/plugins/statisticsViewer/lib/statisticsSQLHandler.php');
- 	
+error_reporting(E_ERROR);
 
- 	class StatisticsController extends ActionController {
+
+class StatisticsController extends ActionController {
  		# -------------------------------------------------------
   		protected $opo_config,		// plugin configuration file
         $ops_plugin_name, $ops_plugin_path;
@@ -120,6 +121,20 @@
             $this->render('eglises_html.php');
         }
 
+
+        public function Eglise() {
+            $eglise_id=$this->request->getParameter('ID', pString);
+            // Force for now
+            //$eglise_id=387;
+            $o_data = new Db();
+            $vs_request = "select objects.object_id, medias.representation_id from ca_objects objects left join ca_objects_x_object_representations medias on objects.object_id=medias.object_id and medias.is_primary=1 where type_id=27 and deleted=0 and parent_id=$eglise_id";
+            $qr_result = $o_data->query($vs_request);
+            $vs_results = $qr_result->getAllRows();
+
+            $this->view->setVar('eglise_id', $eglise_id);
+            $this->view->setVar('objects_data', $vs_results);
+            $this->render('eglise_html.php');
+        }
         /*
          * Json based views
          */
