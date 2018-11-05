@@ -54,11 +54,6 @@ class StatisticsController extends ActionController {
  			$this->ops_plugin_name = "suiviInventaireEglises";
  			$this->ops_plugin_path = __CA_APP_DIR__."/plugins/".$this->ops_plugin_name."Plugin";
 
- 			if (!$this->request->user->canDoAction('can_use_statistics_viewer_plugin')) {
- 				$this->response->setRedirect($this->request->config->get('error_display_url').'/n/3000?r='.urlencode($this->request->getFullUrlPath()));
- 				return;
- 			}
-
  			$vs_conf_file = $this->ops_plugin_path."/conf/".$this->ops_plugin_name.".conf";
  			if(is_file($vs_conf_file)) {
                 $this->opo_config = Configuration::load($vs_conf_file);
@@ -134,6 +129,49 @@ class StatisticsController extends ActionController {
             $this->view->setVar('eglise_id', $eglise_id);
             $this->view->setVar('objects_data', $vs_results);
             $this->render('eglise_html.php');
+        }
+
+        public function Suivi() {
+            $o_data = new Db();
+            $vs_request = "select object_id, idno from ca_objects where type_id=262";
+            $qr_result = $o_data->query($vs_request);
+            $objects_data = $qr_result->getAllRows();
+
+            foreach($qr_result->getAllRows() as $objet) {
+                // Force for now
+                //$eglise_id=387;
+                $vs_request1 = "select objects.object_id, medias.representation_id from ca_objects objects left join ca_objects_x_object_representations medias on objects.object_id=medias.object_id and medias.is_primary=1 where type_id=27 and deleted=0 and parent_id=".$objet["object_id"];
+                $qr_result1 = $o_data->query($vs_request1);
+                $objects_data = $qr_result1->getAllRows();
+
+                $num_completed=0;
+                $num_objets = sizeof($objects_data);
+
+                // First pass : computing
+                foreach($objects_data as $object) {
+                    if (!$object["representation_id"]) continue;
+                    $num_completed++;
+                }
+                print $objet["idno"]." ".($num_objets > 0 ? round($num_completed/$num_objets*100,2) : 0)."\n";
+
+                $o_data->query("REPLACE INTO acf_suivi_avancement (eglise_id, avancement) VALUES (".$objet["object_id"].",".($num_objets > 0 ? round($num_completed/$num_objets*100,2) : 0).")");
+            }
+
+            print json_encode(["results"=>"OK"]);
+            die();
+        }
+
+        public function JaiFini() {
+            $eglise_id=$this->request->getParameter('ID', pString);
+            $this->view->setVar("eglise_id", $eglise_id);
+            $this->render('jaifini_confirmation_html.php');
+        }
+
+
+        public function DemandeValidation() {
+            $eglise_id=$this->request->getParameter('ID', pString);
+            $this->view->setVar("eglise_id", $eglise_id);
+            $this->render('demande_validation_html.php');
         }
         /*
          * Json based views
